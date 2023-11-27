@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.LinkedList; 
 import java.util.Queue;
 import java.util.Stack;
@@ -20,6 +21,13 @@ class TNo {
         this.dir_ant = dir_ant;
         this.filhos = new LinkedList<>();
     }
+    
+    public long getTamanho() {
+    	//obtem o tamanho do arquivo
+    	File file = new File(path);
+    	return file.length();
+    }
+    
 }
 
 public class Shell {
@@ -33,10 +41,17 @@ public class Shell {
 
     // m - criar diretório
     public void criarDiretorio(String nome) {
+    	//Cria diretorio no computador
+    	File dir = new File(corrente.path + "/" + nome);
+    	dir.mkdirs();
+    	
+    	//Add diretorio a arvore
         TNo novoDir = new TNo(nome, corrente.path + "/" + nome, 'd', corrente);
         corrente.filhos.add(novoDir);
     }
-
+    
+    
+    
     // c - mudar diretório corrente
     public void mudarDiretorio(String nome) {
         for (TNo filho : corrente.filhos) {
@@ -74,7 +89,7 @@ public class Shell {
 
         while (!fila.isEmpty()) {
             TNo no = fila.poll();
-            System.out.println(no.path);
+            System.out.println(no.path + " (" + no.getTamanho() + " bytes)");
 
             fila.addAll(no.filhos);
         }
