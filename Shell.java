@@ -73,8 +73,12 @@ public class Shell {
     public void mudarDiretorio(String nome) {
         for (TNo filho : corrente.filhos) {
             if (filho.tipo == 'd' && filho.id.equals(nome)) {
-                corrente = filho;
-                return;
+            	if (filho.path.startsWith(corrente.path)) {
+            		corrente = filho;
+            	}else {
+            		  System.out.println("Diretorio nao encontrado: " + nome);
+            	}
+            	return;
             }
         }
         System.out.println("Diretorio nao encontrado: " + nome);
@@ -82,13 +86,26 @@ public class Shell {
 
     // d - remover um arquivo
     public void removerArquivo(String nome) {
+    	TNo arquivoParaRemover = null;
         for (TNo filho : corrente.filhos) {
             if (filho.tipo == 'a' && filho.id.equals(nome)) {
-                corrente.filhos.remove(filho);
-                return;
+                arquivoParaRemover = filho;
+                break;
             }
         }
-        System.out.println("Arquivo nao encontrado: " + nome);
+        
+        if (arquivoParaRemover != null) {
+        	corrente.filhos.remove(arquivoParaRemover);
+        	File arquivoNoSistema = new File(arquivoParaRemover.path);
+        	if (arquivoNoSistema.exists()) {
+        		arquivoNoSistema.delete();
+        		System.out.println("Arquivo removido: " + nome);
+        	}else {
+        		System.out.println("Arquivo nao encontrado no sistema de arquivos: " + nome);
+        	}
+        }else {
+        	System.out.println("Arquivo nao encontrado na arvore: " + nome);
+        }
     }
 
     // p – Apresentar a árvore realizando um percurso em profundidade
