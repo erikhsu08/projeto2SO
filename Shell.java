@@ -1,4 +1,10 @@
+/* TURMA: 04G11
+NOME: ERIK SAMUEL VIANA HSU 							TIA: 32265921
+NOME: MATEUS KENZO IOCHIMOTO 							TIA: 32216289
+NOME: RODRIGO MACHADO DE ASSIS OLIVEIRA DE LIMA			TIA: 32234678
+NOME: THIAGO SHIHAN CARDOSO TOMA						TIA: 32210744
 
+*/
 
 import java.io.File;
 import java.util.LinkedList; 
@@ -37,11 +43,13 @@ public class Shell {
     private TNo corrente; // Diretório corrente
 
     public Shell(String raizPath) {
+    	//Inicializa a arvore de diretorios com a raiz fornecida
         this.raiz = carregarArvore(new File(raizPath), null);
-        this.corrente = this.raiz;
+        this.corrente = this.raiz; //define o diretorio corrente como a raiz no inicio
     }
     
     private TNo carregarArvore(File diretorio, TNo dir_ant) {
+    	//Carregar árvore de diretórios recursivamente
     	String id = diretorio.getName();
     	String path = diretorio.getAbsolutePath();
     	char tipo = diretorio.isDirectory() ? 'd' : 'a';
@@ -50,6 +58,7 @@ public class Shell {
     	
     	if (diretorio.isDirectory()) {
     		for (File filho : diretorio.listFiles()) {
+    			//Carrega os filhos (diretorios ou arquivos)
     			TNo filhoNo = carregarArvore(filho, no);
     			no.filhos.add(filhoNo);
     		}
@@ -62,7 +71,7 @@ public class Shell {
     	File dir = new File(corrente.path + "/" + nome);
     	dir.mkdirs();
     	
-    	//Add diretorio a arvore
+    	//Add diretorio na arvore
         TNo novoDir = new TNo(nome, corrente.path + "/" + nome, 'd', corrente);
         corrente.filhos.add(novoDir);
     }
@@ -71,19 +80,30 @@ public class Shell {
     
     // c - mudar diretório corrente
     public void mudarDiretorio(String nome) {
-        for (TNo filho : corrente.filhos) {
-            if (filho.tipo == 'd' && filho.id.equals(nome)) {
-            	if (filho.path.startsWith(corrente.path)) {
-            		corrente = filho;
-            	}else {
-            		  System.out.println("Diretorio nao encontrado: " + nome);
-            	}
-            	return;
-            }
-        }
-        System.out.println("Diretorio nao encontrado: " + nome);
+    	//Encontra o diretorio a partir da raiz
+    	TNo novoCorrente = encontrarDiretorio(raiz, nome);
+    	if (novoCorrente != null) {
+    		corrente = novoCorrente; //se encontrado, define como diretorio corrente 
+    	}else {
+    		System.out.println("Diretorio nao encontrado: " + nome);
+    	}
     }
 
+    
+    // metodo auxiliar para encontrar diretorio a partir da raiz
+    private TNo encontrarDiretorio(TNo no, String nome) {
+    	if (no.tipo == 'd' && no.id.equals(nome)) {
+    		return no;
+    	}
+    	
+    	for (TNo filho : no.filhos) {
+    		TNo resultado = encontrarDiretorio(filho, nome);
+    		if(resultado != null) {
+    			return resultado;
+    		}
+    	}
+    	return null;
+    }
     // d - remover um arquivo
     public void removerArquivo(String nome) {
     	TNo arquivoParaRemover = null;
@@ -95,9 +115,11 @@ public class Shell {
         }
         
         if (arquivoParaRemover != null) {
+        	//remove o arquivo da arvore de diretorios
         	corrente.filhos.remove(arquivoParaRemover);
         	File arquivoNoSistema = new File(arquivoParaRemover.path);
         	if (arquivoNoSistema.exists()) {
+        		//remove o arquivo do sistema de arquivos
         		arquivoNoSistema.delete();
         		System.out.println("Arquivo removido: " + nome);
         	}else {
