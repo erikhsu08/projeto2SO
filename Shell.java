@@ -1,3 +1,5 @@
+
+
 import java.io.File;
 import java.util.LinkedList; 
 import java.util.Queue;
@@ -35,10 +37,25 @@ public class Shell {
     private TNo corrente; // Diretório corrente
 
     public Shell(String raizPath) {
-        this.raiz = new TNo("raiz", raizPath, 'd', null);
+        this.raiz = carregarArvore(new File(raizPath), null);
         this.corrente = this.raiz;
     }
-
+    
+    private TNo carregarArvore(File diretorio, TNo dir_ant) {
+    	String id = diretorio.getName();
+    	String path = diretorio.getAbsolutePath();
+    	char tipo = diretorio.isDirectory() ? 'd' : 'a';
+    	
+    	TNo no = new TNo(id, path, tipo, dir_ant);
+    	
+    	if (diretorio.isDirectory()) {
+    		for (File filho : diretorio.listFiles()) {
+    			TNo filhoNo = carregarArvore(filho, no);
+    			no.filhos.add(filhoNo);
+    		}
+    	}
+    	return no;
+    }
     // m - criar diretório
     public void criarDiretorio(String nome) {
     	//Cria diretorio no computador
@@ -76,7 +93,7 @@ public class Shell {
 
     // p – Apresentar a árvore realizando um percurso em profundidade
     public void percursoProfundidade(TNo no) {
-        System.out.println(no.path);
+        System.out.println(no.path + " (" + no.getTamanho() + " bytes)");
         for (TNo filho : no.filhos) {
             percursoProfundidade(filho);
         }
@@ -97,7 +114,8 @@ public class Shell {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("Uso: java ShellSimulator <raizPath>");
+            System.out.println("No terminal, digite: java Shell <nome da raiz path>");
+            System.out.println("Por exemplo: java Shell / ");
             System.exit(1);
         }
         
